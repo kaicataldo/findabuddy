@@ -24,3 +24,7 @@ jobs:
         run: pipenv run python -m flake8
       - name: Check formatting of files
         run: pipenv run python -m black . --check
+      - name: test
+        run: echo "$PETFINDER_API_KEY"
+        env:
+          PETFINDER_API_KEY: ${{ secrets.PETFINDER_API_KEY }}
