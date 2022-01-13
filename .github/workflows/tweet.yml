@@ -1,0 +1,36 @@
+name: 🐶 Tweet a new buddy on a schedule
+on:
+  schedule:
+    - cron: '0 * * * *'
+jobs:
+  tweet:
+    name: Tweet
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python 3.x
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Install pipenv
+        run: pipx install pipenv
+      - name: Install dependencies
+        run: pipenv install --deploy
+      - name: Send tweet
+        env:
+          PETFINDER_API_KEY: ${{ secrets.PETFINDER_API_KEY }}
+          PETFINDER_SECRET: ${{ secrets.PETFINDER_SECRET }}
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+        run: |
+          pipenv run python findabuddy \
+            --petfinder_api_key "$PETFINDER_API_KEY" \
+            --petfinder_secret "$PETFINDER_SECRET" \
+            --twitter_api_key "$TWITTER_API_KEY" \
+            --twitter_api_secret "$TWITTER_API_SECRET" \
+            --twitter_access_token "$TWITTER_ACCESS_TOKEN" \
+            --twitter_access_token_secret "$TWITTER_ACCESS_TOKEN_SECRET" \
+            --twitter_account_name "FindABuddyNYC" \
+            --location "New York, New York"
