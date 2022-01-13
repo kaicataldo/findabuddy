@@ -1,4 +1,4 @@
-name: 🐶 Tweet a new buddy on a schedule
+name: Tweet a new buddy!
 on:
   schedule:
     - cron: '0 * * * *'

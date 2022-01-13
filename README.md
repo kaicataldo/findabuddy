@@ -1,6 +1,9 @@
 Find-A-Buddy
 ==========
 
+[![Tweet a new buddy!](https://github.com/kaicataldo/findabuddy/actions/workflows/tweet.yml/badge.svg)](https://github.com/kaicataldo/findabuddy/actions/workflows/tweet.yml)
+[![CI](https://github.com/kaicataldo/findabuddy/actions/workflows/ci.yml/badge.svg)](https://github.com/kaicataldo/findabuddy/actions/workflows/ci.yml)
+
       ,:'/  _ ..._         ______ _           _                    ____            _     _
      // ( `""-.._.'       |  ____(_)         | |        /\        |  _ \          | |   | |
      \| /    6\___        | |__   _ _ __   __| |______ /  \ ______| |_) |_   _  __| | __| |_   _
