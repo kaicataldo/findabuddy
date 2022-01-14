@@ -6,7 +6,6 @@ import sys
 import io
 import traceback
 from textwrap import indent
-from typing import Union
 import requests
 import tweepy
 
