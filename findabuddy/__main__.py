@@ -6,6 +6,7 @@ import sys
 import io
 import traceback
 from textwrap import indent
+from typing import Union
 import requests
 import tweepy
 
@@ -238,7 +239,8 @@ def upload_image(
             file=file,
         )
 
-        return media.media_id
+        # TODO: Can we fix the typing here? Would rather not ignore.
+        return media.media_id  # type: ignore
 
 
 def send_tweet(
@@ -248,7 +250,7 @@ def send_tweet(
     access_token: str,
     access_token_secret: str,
     tweet_media_id: int | str = None,
-) -> tweepy.Response:
+) -> str:
     if (media_ids := tweet_media_id) is not None:
         media_ids = [tweet_media_id]
 
@@ -260,16 +262,13 @@ def send_tweet(
     )
     response = client.create_tweet(text=tweet_text, media_ids=media_ids)
 
-    # TODO: Make this exception handling more robust.
-    # This is to ensure type saftey in Pylance.
-    assert type(response) is tweepy.Response
-
-    return response
+    # TODO: Can we fix the typing here? Would rather not ignore.
+    return response.data.get("id")  # type: ignore
 
 
 def main() -> None:
     cli_args = get_cli_args()
-    response = None
+    tweet_id = None
 
     print("\n🐶 Finding a buddy!")
     try:
@@ -291,7 +290,7 @@ def main() -> None:
                     cli_args["twitter_access_token"],
                     cli_args["twitter_access_token_secret"],
                 )
-                response = send_tweet(
+                tweet_id = send_tweet(
                     tweet_text,
                     cli_args["twitter_api_key"],
                     cli_args["twitter_api_secret"],
@@ -315,8 +314,8 @@ def main() -> None:
     else:
         success_msg = "🐦 Tweeted successfully!"
 
-        if response and cli_args["twitter_account_name"] is not None:
-            success_msg = f"{success_msg} https://twitter.com/{cli_args['twitter_account_name']}/status/{response[0]['id']}"  # noqa: E501
+        if tweet_id and cli_args["twitter_account_name"] is not None:
+            success_msg = f"{success_msg} https://twitter.com/{cli_args['twitter_account_name']}/status/{tweet_id}"  # noqa: E501
 
         print(success_msg)
 
