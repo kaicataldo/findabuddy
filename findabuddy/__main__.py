@@ -3,6 +3,7 @@
 import argparse
 import random
 import sys
+import io
 import traceback
 from textwrap import indent
 import requests
@@ -53,7 +54,6 @@ def get_cli_args() -> dict:
     parser = argparse.ArgumentParser(
         description="🐶 Find adoptable dogs looking for a loving home"
     )
-
     parser.add_argument(
         "--petfinder_api_key",
         help="Your key for the Petfinder API",
@@ -101,7 +101,6 @@ def get_cli_args() -> dict:
         help="(Optional) Twitter account name for the generated tweet. Used to construct a URL",  # noqa: E501
         required=False,
     )
-
     args = parser.parse_args()
 
     return {
@@ -172,6 +171,7 @@ def validate_name(name: str) -> str:
     # but the status of the listing hasn't been updated yet.
     if "adoption pending" in name.lower():
         raise Exception("Name indicates this dog is in the process of being adopted!")
+
     return name
 
 
@@ -191,10 +191,54 @@ def generate_tweet(listing: dict) -> str:
         MULTIPLE_END_PHRASES if is_multiple(name) else SINGLE_END_PHRASES
     )
     url = listing.get("url")
+
     if not url:
         raise Exception("No valid URL found.")
 
     return f"{name} {end_phrase} {url}"
+
+
+def get_image_url(listing: dict) -> str | None:
+    primary_images = listing.get("primary_photo_cropped", {})
+    image_url = None
+
+    # Find the largest image available
+    for key in ["full", "large", "medium", "small"]:
+        image_url = primary_images.get(key)
+        if image_url is not None:
+            break
+
+    return image_url
+
+
+def upload_image(
+    listing: dict,
+    api_key: str,
+    api_secret: str,
+    access_token: str,
+    access_token_secret: str,
+) -> str | None:
+    image_url = get_image_url(listing)
+
+    if image_url is None:
+        return
+
+    image_req_res = requests.get(image_url)
+    image_req_res.raise_for_status()
+
+    # Create in-memory file object
+    with io.BytesIO(image_req_res.content) as file:
+        auth = tweepy.OAuthHandler(api_key, api_secret)
+        auth.set_access_token(access_token, access_token_secret)
+
+        # Use Twitter's v1 API because v2 doesn't support image uploads yet
+        api = tweepy.API(auth)
+        media = api.media_upload(
+            "buddy.jpg",
+            file=file,
+        )
+
+        return media.media_id
 
 
 def send_tweet(
@@ -203,17 +247,23 @@ def send_tweet(
     api_secret: str,
     access_token: str,
     access_token_secret: str,
+    tweet_media_id: int | str = None,
 ) -> tweepy.Response:
+    if (media_ids := tweet_media_id) is not None:
+        media_ids = [tweet_media_id]
+
     client = tweepy.Client(
         consumer_key=api_key,
         consumer_secret=api_secret,
         access_token=access_token,
         access_token_secret=access_token_secret,
     )
-    response = client.create_tweet(text=tweet_text)
+    response = client.create_tweet(text=tweet_text, media_ids=media_ids)
+
     # TODO: Make this exception handling more robust.
     # This is to ensure type saftey in Pylance.
     assert type(response) is tweepy.Response
+
     return response
 
 
@@ -234,17 +284,27 @@ def main() -> None:
                     cli_args["distance"],
                 )
                 tweet_text = generate_tweet(listing)
+                tweet_media_id = upload_image(
+                    listing,
+                    cli_args["twitter_api_key"],
+                    cli_args["twitter_api_secret"],
+                    cli_args["twitter_access_token"],
+                    cli_args["twitter_access_token_secret"],
+                )
                 response = send_tweet(
                     tweet_text,
                     cli_args["twitter_api_key"],
                     cli_args["twitter_api_secret"],
                     cli_args["twitter_access_token"],
                     cli_args["twitter_access_token_secret"],
+                    tweet_media_id,
                 )
             except Exception as e:
                 print_indented(str(e))
+
                 if i < MAX_ATTEMPTS:
                     continue
+
                 raise e
             else:
                 break
@@ -254,8 +314,10 @@ def main() -> None:
         sys.exit(1)
     else:
         success_msg = "🐦 Tweeted successfully!"
+
         if response and cli_args["twitter_account_name"] is not None:
             success_msg = f"{success_msg} https://twitter.com/{cli_args['twitter_account_name']}/status/{response[0]['id']}"  # noqa: E501
+
         print(success_msg)
 
 
