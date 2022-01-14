@@ -21,6 +21,6 @@ jobs:
       - name: Install dependencies
         run: pipenv install --deploy --dev
       - name: Lint files
-        run: pipenv run python -m flake8
+        run: make lint
       - name: Check formatting of files
-        run: pipenv run python -m black . --check
+        run: make format-check
