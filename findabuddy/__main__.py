@@ -148,8 +148,8 @@ def get_random_dog_listing(
         "distance": distance,
         "status": "adoptable",
         "type": "Dog",
-        "sort": "random",
-        "limit": 1,
+        "sort": "-recent",
+        "limit": 100,
     }
     response = requests.get(PETFINDER_API_URL, headers=headers, params=params)
     response.raise_for_status()
@@ -158,7 +158,7 @@ def get_random_dog_listing(
     if not results:
         raise Exception(f"No dog listings found for {location}.")
 
-    listing = results[0]
+    listing = random.choice(results)
 
     if type(listing) is not dict:
         raise Exception("Listing is not a JSON object.")
