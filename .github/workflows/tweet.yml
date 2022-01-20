@@ -34,4 +34,5 @@ jobs:
             --twitter_access_token "$TWITTER_ACCESS_TOKEN" \
             --twitter_access_token_secret "$TWITTER_ACCESS_TOKEN_SECRET" \
             --twitter_account_name "FindABuddyNYC" \
-            --location "New York, New York"
+            --location "New York, New York" \
+            --distance 50
