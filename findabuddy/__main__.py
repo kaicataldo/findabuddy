@@ -148,7 +148,7 @@ def get_random_dog_listing(
         "distance": distance,
         "status": "adoptable",
         "type": "Dog",
-        "sort": "-recent",
+        "sort": "random",
         "limit": 100,
     }
     response = requests.get(PETFINDER_API_URL, headers=headers, params=params)
