@@ -4,7 +4,9 @@ import argparse
 import random
 import sys
 import io
+import html
 import traceback
+from typing import Optional
 from textwrap import indent
 import requests
 import tweepy
@@ -195,10 +197,10 @@ def generate_tweet(listing: dict) -> str:
     if not url:
         raise Exception("No valid URL found.")
 
-    return f"{name} {end_phrase} {url}"
+    return html.unescape(f"{name} {end_phrase} {url}")
 
 
-def get_image_url(listing: dict) -> str | None:
+def get_image_url(listing: dict) -> Optional[str]:
     primary_images = listing.get("primary_photo_cropped", {})
     image_url = None
 
@@ -217,7 +219,7 @@ def upload_image(
     api_secret: str,
     access_token: str,
     access_token_secret: str,
-) -> str | None:
+) -> Optional[int]:
     image_url = get_image_url(listing)
 
     if image_url is None:
@@ -248,7 +250,7 @@ def send_tweet(
     api_secret: str,
     access_token: str,
     access_token_secret: str,
-    tweet_media_id: int | str = None,
+    tweet_media_id: Optional[int],
 ) -> str:
     if (media_ids := tweet_media_id) is not None:
         media_ids = [tweet_media_id]
