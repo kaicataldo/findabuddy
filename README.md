@@ -18,7 +18,7 @@ Find-A-Buddy is a Twitter bot that uses the PetFinder API to tweet listings of a
 This is a rewrite of one of my very first [projects](https://github.com/kaicataldo/findabuddy-v1), this time written in Python since it's the current language I'm learning 😊.
 
 # DEPRECATION NOTICE
-__Given the recent goings-on at Twitter (both from an organizational and technical view), I've decided to deprecate this repository. https://twitter.com/findabuddynyc stopped running suddenly with little warning due to breaking API changes and is no longer running (I can't even access the page any more because Twitter is currently not letting users view tweets unless they're logged in). It was a fun nearly 9 years (still can't believe I started this that long ago!), and thanks to all the Twitter users who supported the account along the way. 🐶❤️__
+__Given the recent goings-on at Twitter (both from an organizational and technical view), I've decided to deprecate this repository. https://twitter.com/findabuddynyc suddenly stopped running with little warning due to breaking API changes (and now I can't even access the page any more because Twitter is currently not letting users view tweets unless they're logged in). It was a fun nearly 9 years (still can't believe I started this that long ago!), and thanks to all the Twitter users who supported the account along the way. 🐶❤️__
 
 # Usage
 
